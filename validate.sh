@@ -11,6 +11,7 @@ script_path=$(realpath $0)
 BASE_DIR=$(dirname $script_path)
 TOKEN_FILE="${BASE_DIR}/token.txt"
 REQUEST_FILE="${BASE_DIR}/request.txt"
+REQUEST_APP="${BASE_DIR}/request-app.txt"
 REPORT_DIR="${HOME}/build/reports"
 API_LOGIN_URL='https://api.splunk.com/2.0/rest/login/splunk'
 API_VAL_URL='https://appinspect.splunk.com/v1/app/validate'
@@ -29,6 +30,7 @@ fi
 
 check_path() {
         test ! -f $1 && echo "Please enter valid path to App" && exit 1
+        echo $1 > $REQUEST_APP
 }
 
 validate() {
@@ -60,7 +62,7 @@ get_status() {
 get_report() {
         token=$(<$TOKEN_FILE)
         request=$(<$REQUEST_FILE)
-        curl -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/$request" > ${REPORT_DIR}/${request}.html
+        curl -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request}.html
 }
 
 help() {
