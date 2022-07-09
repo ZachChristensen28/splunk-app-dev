@@ -72,8 +72,8 @@ $0 [validate|v|submit|cloud|status|report] [app_path]
 Parameters
 ----------
 -v, validate    Get token from Splunk. Password required.
-submit          Submit an app. App path required.
-cloud           Submit an app to be cloud verified. App path required.
+-s, submit          Submit an app. App path required.
+-c, cloud           Submit an app to be cloud verified. App path required.
 status          Get status of verification.
 report          Get Report.
 app_path        Path to App.
@@ -85,8 +85,8 @@ exit 0
 
 case $1 in
         "-v" | "validate" ) validate ;;
-        "submit" ) submit $2 ;;
-        "cloud" ) submit_cloud $2 ;;
+        "-s" | "submit" ) submit $2 ;;
+        "-c" | "cloud" ) submit_cloud $2 ;;
         "status" ) get_status ;;
         "report" ) get_report ;;
         * ) help ;;
