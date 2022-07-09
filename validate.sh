@@ -30,7 +30,12 @@ fi
 
 check_path() {
         test ! -f $1 && echo "Please enter valid path to App" && exit 1
-        echo $1 > $REQUEST_APP
+
+        if [[ -z $2 ]]; then
+                echo "${1%.tar.gz}" > $REQUEST_APP
+        else
+                echo "${1%.tar.gz}-${2}" > $REQUEST_APP
+        fi
 }
 
 validate() {
@@ -48,7 +53,7 @@ submit() {
 }
 
 submit_cloud() {
-        check_path $1
+        check_path $1 cloud
         token=$(<$TOKEN_FILE)
         curl -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" -F "included_tags=cloud" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
 }
@@ -62,7 +67,7 @@ get_status() {
 get_report() {
         token=$(<$TOKEN_FILE)
         request=$(<$REQUEST_FILE)
-        curl -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request}.html
+        curl -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${REQUEST_APP}.html
 }
 
 help() {
