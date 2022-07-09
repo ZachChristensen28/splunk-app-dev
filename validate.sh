@@ -69,6 +69,9 @@ get_report() {
         request=$(<$REQUEST_FILE)
         request_app=$(<$REQUEST_APP)
         curl -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request_app}.html
+        echo
+        echo -e "\tReport downloaded to ${REPORT_DIR}/${request_app}.html"
+        echo
 }
 
 help() {
