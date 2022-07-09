@@ -67,7 +67,8 @@ get_status() {
 get_report() {
         token=$(<$TOKEN_FILE)
         request=$(<$REQUEST_FILE)
-        curl -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${REQUEST_APP}.html
+        request_app=$(<$REQUEST_APP)
+        curl -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request_app}.html
 }
 
 help() {
