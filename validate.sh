@@ -2,6 +2,8 @@
 #
 # Validate Splunk apps
 #
+# Updated by zTs: July 9, 2022
+#
 # =======================================
 # Customize
 #
