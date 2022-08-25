@@ -45,7 +45,7 @@ check_path() {
 
 check_run() {
         if [[ $1 -gt 0 ]]; then
-                echo "previous action failed"
+                echo "previous action failed - $2"
                 exit 1
         fi
 }
@@ -88,8 +88,10 @@ get_status() {
         fi
         echo "Fetching status (check_count=$check_count)"
         token=$(<$TOKEN_FILE)
+        check_run $? 'token file'
         request=$(<$REQUEST_FILE)
-        status=$(curl $CURL_OPTS -X GET -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request" | jq ".info")
+        check_run $? 'request file'
+        status=$(curl $CURL_OPTS -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request" | jq ".info")
         check_run $?
 
         if [[ $status ==  "null" ]]; then
