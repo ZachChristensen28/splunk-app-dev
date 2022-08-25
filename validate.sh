@@ -23,9 +23,9 @@ APP=${temp//./-}
 # =======================================
 
 if [[ -z $DEBUG ]]; then
-        $CURL_OPTS=''
+        CURL_OPTS=''
 else
-        $CURL_OPTS='-sS'
+        CURL_OPTS='-sS'
 fi
 
 # Create report directory
