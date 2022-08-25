@@ -22,6 +22,11 @@ APP=${temp//./-}
 # End Customization
 # =======================================
 
+if [[ -z $DEBUG ]]; then
+        $CURL_OPTS=''
+else
+        $CURL_OPTS='-sS'
+fi
 
 # Create report directory
 if [[ ! -d $REPORT_DIR ]]; then
@@ -45,9 +50,10 @@ check_run() {
 validate() {
         echo "Validating Credentials"
         if [[ -z $API_PASS ]]; then
-                curl -X GET -u "${API_USER}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
+                curl $CURL_OPTS -X GET -u "${API_USER}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
         else
-                curl -X GET -u "${API_USER}:${API_PASS}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
+                echo "Validating with username and password"
+                curl $CURL_OPTS -X GET -u "${API_USER}:${API_PASS}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
         fi
         check_run
 }
@@ -56,7 +62,7 @@ submit() {
         echo "Submitting app"
         check_path $1
         token=$(<$TOKEN_FILE)
-        curl -sS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
+        curl $CURL_OPTS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
         check_run
 }
 
@@ -65,7 +71,7 @@ submit_cloud() {
         echo "Submitting app for cloud vetting"
         check_path $1 cloud
         token=$(<$TOKEN_FILE)
-        curl -sS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" -F "included_tags=cloud" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
+        curl $CURL_OPTS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" -F "included_tags=cloud" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
         check_run
 }
 
@@ -79,7 +85,7 @@ get_status() {
         echo "Fetching status (check_count=$check_count)"
         token=$(<$TOKEN_FILE)
         request=$(<$REQUEST_FILE)
-        status=$(curl -sS -X GET -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request" | jq ".info")
+        status=$(curl $CURL_OPTS -X GET -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request" | jq ".info")
         check_run
 
         if [[ $status ==  "null" ]]; then
@@ -106,7 +112,7 @@ get_report() {
         token=$(<$TOKEN_FILE)
         request=$(<$REQUEST_FILE)
         request_app=$(<$REQUEST_APP)
-        curl -sS -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request_app}.html
+        curl $CURL_OPTS -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request_app}.html
         check_run
         echo
         echo -e "\tReport downloaded to ${REPORT_DIR}/${request_app}.html"
