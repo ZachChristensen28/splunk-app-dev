@@ -91,7 +91,7 @@ get_status() {
         check_run $? 'token file'
         request=$(<$REQUEST_FILE)
         check_run $? 'request file'
-        status=$(curl -sS -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request" | jq ".info")
+        status=$(curl -sS -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request") #| jq .info)
         check_run $? 'status request'
 
         if [[ $status ==  "null" ]]; then
