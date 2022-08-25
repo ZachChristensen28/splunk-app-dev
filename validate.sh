@@ -79,6 +79,18 @@ submit_cloud() {
         check_run $?
 }
 
+get_report() {
+        echo "Fetching report"
+        token=$(<$TOKEN_FILE)
+        request=$(<$REQUEST_FILE)
+        request_app=$(<$REQUEST_APP)
+        curl $CURL_OPTS -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request_app}.html
+        check_run
+        echo
+        echo -e "\tReport downloaded to ${REPORT_DIR}/${request_app}.html"
+        echo
+}
+
 check_count=0
 check_limit=20
 get_status() {
@@ -101,30 +113,18 @@ get_status() {
                 sleep 20
                 get_status
         else
-                echo "$status"
+                get_report
                 errors=$(echo $status_info | jq ".error")
                 failures=$(echo $status_info | jq ".failure")
                 if [[ $errors -gt 0 ]]; then
-                        echo "Errors found"
+                        touch ~/errors.txt
                 elif [[ $failures -gt 0 ]]; then
-                        echo "Failures found"
+                        touch ~/failures.txt
                 fi
                 exit 0
 
         fi
 
-}
-
-get_report() {
-        echo "Fetching report"
-        token=$(<$TOKEN_FILE)
-        request=$(<$REQUEST_FILE)
-        request_app=$(<$REQUEST_APP)
-        curl $CURL_OPTS -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request_app}.html
-        check_run
-        echo
-        echo -e "\tReport downloaded to ${REPORT_DIR}/${request_app}.html"
-        echo
 }
 
 help() {
