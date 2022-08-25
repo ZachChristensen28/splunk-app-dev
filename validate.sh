@@ -50,10 +50,10 @@ check_run() {
 validate() {
         echo "Validating Credentials"
         if [[ -z $API_PASS ]]; then
-                curl $CURL_OPTS -X GET -u "${API_USER}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
+                curl $CURL_OPTS -u "${API_USER}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
         else
                 echo "Validating with username and password"
-                curl $CURL_OPTS -X GET -u "${API_USER}:${API_PASS}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
+                curl $CURL_OPTS -u "${API_USER}:${API_PASS}" --url "$API_LOGIN_URL" # | jq -r .data.token > $TOKEN_FILE
         fi
         check_run
 }
