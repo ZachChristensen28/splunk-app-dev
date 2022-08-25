@@ -65,7 +65,7 @@ submit() {
         echo "Submitting app"
         check_path $1
         token=$(<$TOKEN_FILE)
-        check_run $?
+        check_run $? "token file"
         curl $CURL_OPTS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
         check_run $?
 }
@@ -91,7 +91,7 @@ get_status() {
         check_run $? 'token file'
         request=$(<$REQUEST_FILE)
         check_run $? 'request file'
-        status=$(curl -sS -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request") #| jq .info)
+        status=$(curl -sS -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request" | jq .info)
         check_run $? 'status request'
 
         if [[ $status ==  "null" ]]; then
