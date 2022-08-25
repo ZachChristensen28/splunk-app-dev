@@ -151,6 +151,7 @@ Parameters
 status          Get status of verification.
 report          Get Report.
 app_path        Path to App.
+errors          Get errors from appinspect results.
 
 EOF
 
@@ -163,5 +164,6 @@ case $1 in
         "-c" | "cloud" ) submit_cloud $2 ;;
         "status" ) get_status ;;
         "report" ) get_report ;;
+        "get_errors" ) get_errors ;;
         * ) help ;;
 esac
