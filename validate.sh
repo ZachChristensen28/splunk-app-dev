@@ -56,7 +56,7 @@ validate() {
                 curl $CURL_OPTS -u "${API_USER}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
         else
                 echo "Validating with username and password"
-                curl $CURL_OPTS -u "${API_USER}:${API_PASS}" --url "$API_LOGIN_URL" # | jq -r .data.token > $TOKEN_FILE
+                curl $CURL_OPTS -u "${API_USER}:${API_PASS}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
         fi
         check_run $?
 }
@@ -65,6 +65,7 @@ submit() {
         echo "Submitting app"
         check_path $1
         token=$(<$TOKEN_FILE)
+        check_run $?
         curl $CURL_OPTS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
         check_run $?
 }
