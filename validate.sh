@@ -2,7 +2,7 @@
 #
 # Validate Splunk apps
 #
-# Updated by zTs: July 9, 2022
+# Updated by zTs: Aug 25, 2022
 #
 # =======================================
 # Customize
@@ -38,37 +38,76 @@ check_path() {
         fi
 }
 
+check_run() {
+        test $? -ne 0 && echo "previous action failed" && exit 1
+}
+
 validate() {
+        echo "Validating Credentials"
         if [[ -z $API_PASS ]]; then
-                curl -X GET -u "${API_USER}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
+                curl -sS -X GET -u "${API_USER}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
         else
-                curl -X GET -u "${API_USER}:${API_PASS}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
+                curl -sS -X GET -u "${API_USER}:${API_PASS}" --url "$API_LOGIN_URL" | jq -r .data.token > $TOKEN_FILE
         fi
+        check_run
 }
 
 submit() {
+        echo "Submitting app"
         check_path $1
         token=$(<$TOKEN_FILE)
-        curl -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
+        curl -sS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
+        check_run
 }
+
 
 submit_cloud() {
+        echo "Submitting app for cloud vetting"
         check_path $1 cloud
         token=$(<$TOKEN_FILE)
-        curl -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" -F "included_tags=cloud" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
+        curl -sS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" -F "included_tags=cloud" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
+        check_run
 }
 
+check_count=0
+check_limit=20
 get_status() {
+        check_count=$((check_count + 1))
+        if [[ $check_count -gt $check_limit ]]; then
+                echo "check limit exceeded" && exit 1
+        fi
+        echo "Fetching status (check_count=$check_count)"
         token=$(<$TOKEN_FILE)
         request=$(<$REQUEST_FILE)
-        curl -X GET -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request"
+        status=$(curl -sS -X GET -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request" | jq ".info")
+        check_run
+
+        if [[ $status ==  "null" ]]; then
+                echo "processing"
+                sleep 20
+                get_status
+        else
+                echo "$status"
+                errors=$(echo $status | jq ".error")
+                failures=$(echo $status | jq ".failure")
+                if [[ $errors -gt 0 ]]; then
+                        echo "Errors found" && exit 1
+                elif [[ $failures -gt 0 ]]; then
+                        echo "Failures found" && exit 1
+                fi
+                exit 0
+
+        fi
+
 }
 
 get_report() {
+        echo "Fetching report"
         token=$(<$TOKEN_FILE)
         request=$(<$REQUEST_FILE)
         request_app=$(<$REQUEST_APP)
-        curl -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request_app}.html
+        curl -sS -X GET -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -H "Content-Type: text/html" --url "${API_REPORT_URL}/${request}" > ${REPORT_DIR}/${request_app}.html
+        check_run
         echo
         echo -e "\tReport downloaded to ${REPORT_DIR}/${request_app}.html"
         echo
