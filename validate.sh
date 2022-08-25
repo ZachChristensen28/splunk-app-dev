@@ -91,17 +91,19 @@ get_status() {
         check_run $? 'token file'
         request=$(<$REQUEST_FILE)
         check_run $? 'request file'
-        status=$(curl -sS -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request" | jq .info)
+        status=$(curl -sS -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request")
         check_run $? 'status request'
 
-        if [[ $status ==  "null" ]]; then
+        status_info=$(echo $status | jq .info)
+
+        if [[ $status_info ==  "null" ]]; then
                 echo "processing"
                 sleep 20
                 get_status
         else
                 echo "$status"
-                errors=$(echo $status | jq ".error")
-                failures=$(echo $status | jq ".failure")
+                errors=$(echo $status_info | jq ".error")
+                failures=$(echo $status_info | jq ".failure")
                 if [[ $errors -gt 0 ]]; then
                         echo "Errors found" && exit 1
                 elif [[ $failures -gt 0 ]]; then
