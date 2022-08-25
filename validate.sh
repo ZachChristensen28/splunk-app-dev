@@ -44,7 +44,10 @@ check_path() {
 }
 
 check_run() {
-        test $? -ne 0 && echo "previous action failed" && exit 1
+        if [[ $1 -gt 0 ]]; then
+                echo "previous action failed"
+                exit 1
+        fi
 }
 
 validate() {
@@ -55,7 +58,7 @@ validate() {
                 echo "Validating with username and password"
                 curl $CURL_OPTS -u "${API_USER}:${API_PASS}" --url "$API_LOGIN_URL" # | jq -r .data.token > $TOKEN_FILE
         fi
-        check_run
+        check_run $?
 }
 
 submit() {
@@ -63,7 +66,7 @@ submit() {
         check_path $1
         token=$(<$TOKEN_FILE)
         curl $CURL_OPTS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
-        check_run
+        check_run $?
 }
 
 
@@ -72,7 +75,7 @@ submit_cloud() {
         check_path $1 cloud
         token=$(<$TOKEN_FILE)
         curl $CURL_OPTS -X POST -H "Authorization: bearer $token" -H "Cache-Control: no-cache" -F "app_package=@\"$1\"" -F "included_tags=cloud" --url "${API_VAL_URL}" | jq -r .links[1].href | awk -F / '{ print $5 }' > $REQUEST_FILE
-        check_run
+        check_run $?
 }
 
 check_count=0
@@ -86,7 +89,7 @@ get_status() {
         token=$(<$TOKEN_FILE)
         request=$(<$REQUEST_FILE)
         status=$(curl $CURL_OPTS -X GET -H "Authorization: bearer $token" --url "${API_VAL_URL}/status/$request" | jq ".info")
-        check_run
+        check_run $?
 
         if [[ $status ==  "null" ]]; then
                 echo "processing"
