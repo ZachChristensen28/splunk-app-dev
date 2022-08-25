@@ -127,6 +127,16 @@ get_status() {
 
 }
 
+get_errors() {
+        if [[ -f ~/errors.txt ]]; then
+                echo "Errors exist" && exit 1
+        elif [[ -f ~/failures.txt ]]; then
+                echo "Failures exist" && exit 1
+        else
+                echo "No errors found" && exit 0
+        fi
+}
+
 help() {
         cat <<EOF
 
