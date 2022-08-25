@@ -23,7 +23,7 @@ APP=${temp//./-}
 # =======================================
 
 if [[ -z $DEBUG ]]; then
-        CURL_OPTS=''
+        CURL_OPTS='-v'
 else
         CURL_OPTS='-sS'
 fi
