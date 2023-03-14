@@ -13,7 +13,6 @@ API_LOGIN_URL='https://api.splunk.com/2.0/rest/login/splunk'
 API_VAL_URL='https://appinspect.splunk.com/v1/app/validate'
 API_STATUS_URL='https://appinspect.splunk.com/v1/app/validate/status'
 API_REPORT_URL='https://appinspect.splunk.com/v1/app/report'
-APP_PATH=$1
 # Removes path and .tgz/tar.gz extension
 app_name_tmp=${APP_PATH##*/}
 APP_NAME=${app_name_tmp%%.t*}
@@ -34,15 +33,16 @@ Required Authentication Vars:
 ## Set through Environment Variables
 API_USER: User for API call
 API_PASS: Password for API call
-
+APP_PATH: Path to Splunk App/Add-on
 
 Usage:
 ------
-    $0 [app_path]
+    $0
 
 Example:
 --------
-    $0 SA-CrowdstrikeDevices
+    # Variables can be passed before argument or be set beforehand as environment variables.
+    API_USER=zTs API_PASS=supersecretstuff APP_PATH=SA-CrowdstrikeDevices $0
 "
 
 exit 0
@@ -61,7 +61,7 @@ log_info() {
 }
 
 # Preflight Check
-[[ ! -f $APP_PATH ]] && log_failure "Specify valid app path" && help
+[[ ! -f $APP_PATH ]] && log_failure 'Specify valid `APP_PATH`' && help
 [[ -z $API_USER ]] && log_failure 'Specify `API_USER` using environment variable' && help
 [[ -z $API_PASS ]] && log_failure 'Specify `API_PASS` using environment variable' && help
 log_success "Preflight Checks passed"
