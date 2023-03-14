@@ -71,7 +71,7 @@ auth_response=$(curl $CURL_OPTS\
     --header "Authorization: Basic $basic_auth"\
     --url "$API_LOGIN_URL")
 status_code=$(echo $auth_response | jq -r .status_code)
-[[ $status_code -gt 200 ]] && log_failure "$(echo $auth_response | jq -r .errors)" && exit $status_code
+[[ $status_code -ne 200 ]] && log_failure "$(echo $auth_response | jq -r .errors)" && exit $status_code
 API_TOK=$(echo $auth_response | jq -r .data.token)
 log_success "Authentication successful"
 sleep 1
