@@ -6,8 +6,6 @@
 #
 # Use at your own risk :)
 #
-script_path=$(realpath $0)
-BASE_DIR=$(dirname $script_path)
 REPORT_DIR="${HOME}/reports"
 API_LOGIN_URL='https://api.splunk.com/2.0/rest/login/splunk'
 API_VAL_URL='https://appinspect.splunk.com/v1/app/validate'
@@ -37,12 +35,12 @@ APP_PATH: Path to Splunk App/Add-on
 
 Usage:
 ------
-    $0
+    ./appinspect.sh
 
 Example:
 --------
     # Variables can be passed before argument or be set beforehand as environment variables.
-    API_USER=zTs API_PASS=supersecretstuff APP_PATH=SA-CrowdstrikeDevices $0
+    API_USER=zTs API_PASS=supersecretstuff APP_PATH=SA-CrowdstrikeDevices ./appinspect.sh
 "
 
 exit 0
