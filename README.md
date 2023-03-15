@@ -12,9 +12,12 @@ For building and publishing Splunk Apps and Add-ons
     slim package -o ~/build/pacakage TA-linux_iptables
     ```
 
-## Submit to Splunk
+## Submit to Appinspect
 
-1. validate -v
-1. validate submit <package>
-1. validate status
-1. validate report
+export API_USER='api-username'
+
+export API_PASS='api-password'
+
+export APP_PATH='/path/to/App'
+
+./appinspect.sh
