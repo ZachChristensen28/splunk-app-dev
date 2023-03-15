@@ -87,8 +87,8 @@ Usage:
 
 Example:
 --------
-    # Variables can be passed before argument or be set beforehand as environment variables.
     API_USER=zTs API_PASS=supersecretstuff APP_PATH=SA-CrowdstrikeDevices ./appinspect.sh
+
 HELPMSG
 
 exit 0
