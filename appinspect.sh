@@ -2,7 +2,7 @@
 #
 # Validate Splunk apps
 #
-# Updated by zTs: March 13, 2022
+# Updated by zTs: March 14, 2023
 #
 # Use at your own risk :)
 #
