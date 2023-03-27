@@ -1,5 +1,6 @@
-#!/bin/bash
-#
+#!/usr/bin/env bash
+# shellcheck disable=SC1090
+
 # Validate Splunk apps
 #
 # Updated by zTs: March 14, 2023
