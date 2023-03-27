@@ -21,7 +21,7 @@
 # --------
 # API_USER=zTs API_PASS=supersecretstuff APP_PATH=./SA-CrowdstrikeDevices ./appinspect.sh
 #
-set -o errexit   # abort on nonzero exitstatus
+# set -o errexit   # abort on nonzero exitstatus
 set -o pipefail  # don't hide errors within pipes
 
 IFS=$'\t\n'   # Split on newlines and tabs (but not on spaces)
@@ -113,6 +113,7 @@ finish() {
 trap finish EXIT ERR
 
 authenticate() {
+    log_info "Authenticating.."
     local basic_auth auth_response status_code
     basic_auth=$(echo -n "${API_USER}:${API_PASS}" | base64)
     auth_response=$(curl ${CURL_OPTS}\
@@ -127,6 +128,7 @@ authenticate() {
 }
 
 submit_app() {
+    log_info "Submitting app.."
     local submit_response
     submit_response=$(curl ${CURL_OPTS}\
         --request POST\
@@ -141,6 +143,7 @@ submit_app() {
 }
 
 check_status() {
+    log_info "Checking status.."
     local check_count sleep_time check_status status fail error warn output_file
     check_count=0
     sleep_time=15
