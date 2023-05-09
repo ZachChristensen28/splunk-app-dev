@@ -174,7 +174,7 @@ check_status() {
             warn=$(echo "${check_status}" | jq -r .info.warning)
             if [[ "${fail}" -gt 0 ]] || [[ "${error}" -gt 0 ]]; then
                 log_err "Failure count: ${fail}, Error count: ${error}"
-                exit 0
+                exit 12
             else
                 log_success "No errors found! Warning count: ${warn}"
                 log_info "Report written to ${output_file}"
