@@ -96,11 +96,11 @@ exit 0
 }
 
 log_success() {
-    printf "[${GREEN}\u2714${RESET}] %s\\n" "${*}"
+    printf "[${GREEN}✔${RESET}] %s\\n" "${*}"
 }
 
 log_err() {
-    printf "[${RED}\u2718${RESET}] %s\\n" "${*}" 1>&2
+    printf "[${RED}✘${RESET}] %s\\n" "${*}" 1>&2
 }
 
 log_info() {
